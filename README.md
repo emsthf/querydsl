@@ -1,9 +1,9 @@
-# QueryDSL
-## 1. QueryDSL이란?
+# Querydsl
+## 1. Querydsl이란?
 Java를 위한 type-safe SQL-like 쿼리 생성 라이브러리.
 이 라이브러리를 사용하면 쿼리의 구성 및 실행 중에 타입 안전성을 유지하면서 SQL 또는 JPQL과 같은 쿼리를 생성할 수 있다.
 
-## 2. QueryDSL의 특징
+## 2. Querydsl의 특징
 - 타입 안정성 : 쿼리 작성 중에 컴파일 타임에 오류를 감지한다. 이를 통해 실행 시간에 발생할 수 있는 많은 오류를 미리 방지할 수 있다.
 - 체이닝 방식의 쿼리 작성 : 쿼리를 체이닝 방식으로 작성하므로 가독성이 좋고, 유동적인 쿼리 조건을 쉽게 조합할 수 있다.
 - 다양한 백엔드 지원 : JPA 뿐만 아니라 SQL, JDO, Lucene, Hibernate Search, MongoDB 등 다양한 백엔에 대한 지원을 제공한다.
@@ -15,7 +15,7 @@ Q파일은 QueryDSL의 중심적인 부분이며, 타입 안전성을 보장하�
 
 
 
-# Spring Boot 3.x.x 에서 QueryDSL 사용하기
+# Spring Boot 3.x.x 에서 Querydsl 사용하기
 이번 프로젝트는 Spring Boot 3.1.3을 사용.
 Spring Boot 2.x.x 버전과는 사용법이 많이 달라졌다.
 
