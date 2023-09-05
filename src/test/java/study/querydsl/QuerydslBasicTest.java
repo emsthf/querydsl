@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import study.querydsl.entity.Member;
+import study.querydsl.entity.QTeam;
 import study.querydsl.entity.Team;
 
 import java.util.List;
@@ -276,5 +277,49 @@ public class QuerydslBasicTest {
 
         assertThat(teamB.get(team.name)).isEqualTo("teamB");
         assertThat(teamB.get(member.age.avg())).isEqualTo(35);
+    }
+
+    /**
+     * 팀 A에 소속된 모든 회원
+     */
+    @Test
+    void join() throws Exception {
+        // given
+
+        // when
+        List<Member> result = queryFactory
+                .selectFrom(member)
+                .leftJoin(member.team, team)  // member.team이 team과 조인이 된다.
+                .where(team.name.eq("teamA"))
+                .fetch();
+
+        // then
+        assertThat(result)
+                .extracting("username")  // username이
+                .containsExactly("member1", "member2");  // member1, member2가 나올 것이다.
+    }
+
+    /**
+     * 세타 조인 (연관관계가 없는 조인)
+     * 회원의 이름이 팀 이름과 같은 회원을 조회
+     */
+    @Test
+    void thetaJoin() throws Exception {
+        // given
+        em.persist(new Member("teamA"));
+        em.persist(new Member("teamB"));
+        em.persist(new Member("teamC"));
+
+        // when
+        List<Member> result = queryFactory
+                .select(member)
+                .from(member, team)  // from 절에 여러 엔티티를 나열해서 세타 조인을 할 수 있다.
+                .where(member.username.eq(team.name))
+                .fetch();  // 모든 회원을 가져오고, 모든 팀을 가져와서 다 조인을 해버리는 것. 그리고 where절에서 필터링. DB가 알아서 성능 최적화를 해주긴 한다.
+
+        // then
+        assertThat(result)
+                .extracting("username")
+                .containsExactly("teamA", "teamB");
     }
 }
