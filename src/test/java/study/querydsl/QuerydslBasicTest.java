@@ -116,7 +116,8 @@ public class QuerydslBasicTest {
 
         Member fetchOne = queryFactory
                 .selectFrom(member)
-                .fetchOne();// 단 건 조회
+                .where(member.username.eq("member1"))
+                .fetchOne();  // 단 건 조회
 
         Member fetchFirst = queryFactory
                 .selectFrom(member)
@@ -138,6 +139,24 @@ public class QuerydslBasicTest {
 
         // then
         assertThat(totalCount).isEqualTo(4);
+    }
+
+    @Test
+    void totalCount() throws Exception {
+        // given
+        Member member5 = new Member("member5", 10);
+        Member member6 = new Member("member6", 10);
+        em.persist(member5);
+        em.persist(member6);
+
+        // when
+        int total = queryFactory
+                .select(member)
+                .from(member)
+                .fetch().size();  // fetchResult()가 deprecated 되었기 때문에 totalCount를 계산할 때에는 fetch().size()를 사용한다.
+
+        // then
+        assertThat(total).isEqualTo(6);
     }
 
     /**
@@ -167,5 +186,42 @@ public class QuerydslBasicTest {
         assertThat(member5.getUsername()).isEqualTo("member5");
         assertThat(member6.getUsername()).isEqualTo("member6");
         assertThat(memberNull.getUsername()).isNull();
+    }
+
+    @Test
+    void paging1() throws Exception {
+        // given
+
+        // when
+        List<Member> result = queryFactory
+                .selectFrom(member)
+                .orderBy(member.username.desc())
+                .offset(1)  // offset은 앞의 몇개를 끊어서 사용할 건지. 0부터 시작이므로 1개를 스킵한다는 말.
+                .limit(2)
+                .fetch();
+
+        // then
+        assertThat(result.size()).isEqualTo(2);
+    }
+
+    @Test
+    void paging2() throws Exception {
+        // given
+
+        // when
+        List<Member> result = queryFactory
+                .selectFrom(member)
+                .orderBy(member.username.desc())
+                .offset(1)  // offset은 앞의 몇개를 끊어서 사용할 건지. 0부터 시작이므로 1개를 스킵한다는 말.
+                .limit(2)
+                .fetch();
+
+        int totalCount = queryFactory
+                .selectFrom(member)
+                .fetch().size();
+
+        // then
+        assertThat(result.size()).isEqualTo(2);
+        assertThat(totalCount).isEqualTo(4);
     }
 }
