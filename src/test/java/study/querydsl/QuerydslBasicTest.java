@@ -10,6 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 import study.querydsl.entity.Member;
 import study.querydsl.entity.Team;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static study.querydsl.entity.QMember.member;
 
@@ -101,5 +103,40 @@ public class QuerydslBasicTest {
 
         // then
         assertThat(findMember.getUsername()).isEqualTo("member1");
+    }
+
+    @Test
+    void resultFetch() throws Exception {
+        // given
+
+        // when
+        List<Member> fetch = queryFactory
+                .selectFrom(member)
+                .fetch();// 리스트로 조회
+
+        Member fetchOne = queryFactory
+                .selectFrom(member)
+                .fetchOne();// 단 건 조회
+
+        Member fetchFirst = queryFactory
+                .selectFrom(member)
+                .fetchFirst();// limit(1).fetchOne()과 같다.
+
+        // then
+
+    }
+
+    @Test
+    void count() throws Exception {
+        // given
+
+        // when
+        Long totalCount = queryFactory
+                .select(member.count())  // select count(member.id)와 같다.
+                .from(member)
+                .fetchOne();
+
+        // then
+        assertThat(totalCount).isEqualTo(4);
     }
 }
