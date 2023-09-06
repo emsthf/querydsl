@@ -596,4 +596,43 @@ public class QuerydslBasicTest {
         // then
 
     }
+
+    @Test
+    void simpleProjection() throws Exception {
+        // given
+
+        // when
+        List<String> result = queryFactory
+                .select(member.username)
+                .from(member)
+                .fetch();
+
+        for (String s : result) {
+            System.out.println("프로젝션 대상이 1개일 때 = " + s);
+        }
+
+        // then
+
+    }
+
+    @Test
+    void tupleProjection() throws Exception {
+        // given
+
+        // when
+        List<Tuple> result = queryFactory
+                .select(member.username, member.age)  // 조회할 타입이 String도 있고, int도 있기 때문에 querydsl이 tuple 타입으로 반환
+                .from(member)
+                .fetch();
+
+        for (Tuple tuple : result) {
+            String username = tuple.get(member.username);
+            Integer age = tuple.get(member.age);
+            System.out.println("username = " + username);
+            System.out.println("age = " + age);
+        }
+
+        // then
+
+    }
 }
