@@ -322,4 +322,56 @@ public class QuerydslBasicTest {
                 .extracting("username")
                 .containsExactly("teamA", "teamB");
     }
+
+    /**
+     * 예) 회원과 팀을 조인하면서, 팀 이름이 teamA인 팀만 조인하고 회원은 모두 조회
+     * JPQL: select m, t from Member m left join m.team t on t.name = 'teamA'
+     */
+    @Test
+    void join_on_filtering() throws Exception {
+        // given
+
+        // when
+        List<Tuple> result = queryFactory
+                .select(member, team)
+                .from(member)
+                .leftJoin(member.team, team)
+                .on(team.name.eq("teamA"))  // on절을 통해서 조인 대상을 필터링 할 수 있다.
+                .fetch();
+
+        for (Tuple tuple : result) {
+            System.out.println("tuple = " + tuple);
+        }
+
+        // then
+
+    }
+
+    /**
+     * 연관관계가 없는 엔티티 외부 조인
+     * 회원의 이름이 팀 이름과 같은 회원을 조회
+     */
+    @Test
+    void join_on_on_relation() throws Exception {
+        // given
+        em.persist(new Member("teamA"));
+        em.persist(new Member("teamB"));
+        em.persist(new Member("teamC"));
+
+        // when
+        List<Tuple> result = queryFactory
+                .select(member, team)
+                .from(member)
+                .join(team).on(member.username.eq(team.name))  // 보통 join은 join(member.team, team)이렇게 사용하는데 이 연관관계가 없는 외부 조인은 leftJoin(team)으로 사용한다.
+                .fetch();// 모든 회원을 가져오고, 모든 팀을 가져와서 다 조인을 해버리는 것. 그리고 where절에서 필터링. DB가 알아서 성능 최적화를 해주긴 한다.
+
+        for (Tuple tuple : result) {
+            System.out.println("tuple = " + tuple);
+        }
+
+        // then
+        assertThat(result)
+                .extracting(tuple -> tuple.get(0, Member.class).getUsername())
+                .containsExactly("teamA", "teamB");
+    }
 }
