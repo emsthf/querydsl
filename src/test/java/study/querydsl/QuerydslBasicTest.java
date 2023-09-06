@@ -3,6 +3,8 @@ package study.querydsl;
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.PersistenceUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -373,5 +375,49 @@ public class QuerydslBasicTest {
         assertThat(result)
                 .extracting(tuple -> tuple.get(0, Member.class).getUsername())
                 .containsExactly("teamA", "teamB");
+    }
+
+    @PersistenceUnit
+    EntityManagerFactory emf;
+
+    @Test
+    void fetchJoinNo() throws Exception {
+        // given
+        // 페치 조인할 때 영속성 컨텍스트에 있는 것을 안지워주면 제대로 된 결과를 보기 힘들기 때문에 비워준다.
+        em.flush();
+        em.clear();
+        
+        // when
+        Member findMember = queryFactory
+                .selectFrom(member)
+                .where(member.username.eq("member1"))
+                .fetchOne();
+        // Member에 있는 연관관계 team은 LAZY로 세팅했기 때문에 딱 member만 조회되고 team은 조회되지 않는다.
+
+
+        // then
+        boolean loaded = emf.getPersistenceUnitUtil().isLoaded(findMember.getTeam());// 이미 로딩된 엔티티인지, 초기화되지 않은 엔티티인지 판별
+        assertThat(loaded).as("페치 조인 미적용").isFalse();  // LAZY 로딩 세팅으로 team은 아직 초기화가 안되어 있기 때문에 false가 나온다.
+    }
+
+    @Test
+    void fetchJoinUse() throws Exception {
+        // given
+        // 페치 조인할 때 영속성 컨텍스트에 있는 것을 안지워주면 제대로 된 결과를 보기 힘들기 때문에 비워준다.
+        em.flush();
+        em.clear();
+
+        // when
+        Member findMember = queryFactory
+                .selectFrom(member)
+                .join(member.team, team).fetchJoin()  // 페치 조인을 사용하면 LAZY 로딩 세팅을 하더라도 member와 연관관계가 있는 team도 같이 조회가 된다.
+                .where(member.username.eq("member1"))
+                .fetchOne();
+        // Member에 있는 연관관계 team은 LAZY로 세팅했기 때문에 딱 member만 조회되고 team은 조회되지 않는다.
+
+
+        // then
+        boolean loaded = emf.getPersistenceUnitUtil().isLoaded(findMember.getTeam());// 이미 로딩된 엔티티인지, 초기화되지 않은 엔티티인지 판별
+        assertThat(loaded).as("페치 조인 적용").isTrue();  // 페치 조인을 사용했기 때문에 team도 한 쿼리로 같이 조회가 되서 true가 나온다.
     }
 }
