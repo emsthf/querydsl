@@ -879,10 +879,56 @@ public class QuerydslBasicTest {
         // given
 
         // when
-        long count = queryFactory
+        queryFactory
                 .delete(member)
                 .where(member.age.gt(18))
                 .execute();
+
+        // then
+
+    }
+
+    @Test
+    void sqlFunction() throws Exception {
+        // given
+
+        // when
+        List<String> result = queryFactory
+                .select(
+                        Expressions.stringTemplate(
+                                "function('replace', {0}, {1}, {2})",
+                                member.username, "member", "M")
+                )
+                .from(member)
+                .fetch();
+
+        for (String s : result) {
+            System.out.println("s = " + s);
+        }
+
+        // then
+
+    }
+
+    @Test
+    void sqlFunction2() throws Exception {
+        // given
+
+        // when
+        List<String> result = queryFactory
+                .select(member.username)
+                .from(member)
+                .where(member.username.eq(
+                        Expressions.stringTemplate(
+                                "function('lower', {0})",
+                                member.username
+                        )
+                ))
+                .fetch();
+
+        for (String s : result) {
+            System.out.println("s = " + s);
+        }
 
         // then
 
