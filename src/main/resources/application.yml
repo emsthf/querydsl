@@ -1,19 +1,27 @@
 spring:
+  # H2 version
   datasource:
     url: jdbc:h2:tcp://localhost/~/querydsl
     username: sa
     password:
     driver-class-name: org.h2.Driver
 
+  # MySQL version
+#  datasource:
+#    url: jdbc:mysql://localhost:3306/querydsl?serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=false&allowPublicKeyRetrieval=true
+#    username: root
+#    password: test1234
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: create  # create-drop
     properties:
       hibernate:
-#        show_sql: true  # sout?? ?? ??. ??? log? ???? sout?? ??? ???? ????
+#        show_sql: true
         format_sql: true
         use_sql_comments: true
 
 logging.level:
     org.hibernate.SQL: debug
-#    org.hibernate.type: trace  # ???? ??? ??? ? ?? trace ?? ??. ??? ? ?? ?? ????? ????? ?? ????? ????
+#    org.hibernate.type: trace

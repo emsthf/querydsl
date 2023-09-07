@@ -16,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
 import study.querydsl.dto.MemberDto;
 import study.querydsl.dto.QMemberDto;
@@ -824,5 +825,66 @@ public class QuerydslBasicTest {
 
     private BooleanExpression allEq(String usernameCond, Integer ageCond) {
         return usernameEq(usernameCond).and(ageEq(ageCond));  // and를 사용해서 조립할 수 있다.(조립하려면 위 메서드 반환 타입을 BooleanExpression을 사용해야 한다.)
+    }
+
+    @Test
+    void bulkUpdate() throws Exception {
+        // given
+
+        // when
+        long count = queryFactory
+                .update(member)
+                .set(member.username, "비회원")
+                .where(member.age.lt(28))
+                .execute();  // 반환 타입은 영향을 받은 row 수
+
+        // member1 = 10 -> DB 비회원
+        // member2 = 20 -> DB 비회원
+        // member3 = 30 -> DB member3
+        // member4 = 40 -> DB member4
+
+        em.flush();
+        em.clear();
+
+        List<Member> result = queryFactory
+                .selectFrom(member)
+                .fetch();
+
+        for (Member member1 : result) {
+            System.out.println("member1 = " + member1);
+        }
+
+        // then
+
+    }
+
+    @Test
+    void bulkAdd() throws Exception {
+        // given
+
+        // when
+        long count = queryFactory
+                .update(member)
+                .set(member.age, member.age.add(2))  // 곱하기는 multiply(), 나누기는 divide()를 사용한다.
+                .execute();
+
+
+
+        // then
+
+    }
+
+    @Test
+    void bulkDelete() throws Exception {
+        // given
+
+        // when
+        long count = queryFactory
+                .delete(member)
+                .where(member.age.gt(18))
+                .execute();
+
+        // then
+
     }
 }
