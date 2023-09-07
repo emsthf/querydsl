@@ -4,6 +4,7 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
@@ -769,9 +770,8 @@ public class QuerydslBasicTest {
         String usernameParam = "member1";
         Integer ageParam = null;
 
-        List<Member> result = searchMember1(usernameParam, ageParam);
-
         // when
+        List<Member> result = searchMember1(usernameParam, ageParam);
 
         // then
         assertThat(result.size()).isEqualTo(1);
@@ -791,5 +791,38 @@ public class QuerydslBasicTest {
                 .selectFrom(member)
                 .where(builder)  // where절에 조립한 BooleanBuilder를 넣어주면 된다
                 .fetch();
+    }
+
+    @Test
+    void dynamicQuery_WhereParam() throws Exception {
+        // given
+        String usernameParam = "member1";
+        Integer ageParam = null;
+
+        // when
+        List<Member> result = searchMember2(usernameParam, ageParam);
+
+        // then
+        assertThat(result.size()).isEqualTo(1);
+    }
+
+    private List<Member> searchMember2(String usernameCond, Integer ageCond) {
+        return queryFactory
+                .selectFrom(member)
+//                .where(usernameEq(usernameCond), ageEq(ageCond))  // 메서드를 직접 만들어서 where문 안에서 바로 해결해버릴 수 있다.
+                .where(allEq(usernameCond, ageCond))
+                .fetch();
+    }
+
+    private BooleanExpression usernameEq(String usernameCond) {
+        return usernameCond != null ? member.username.eq(usernameCond) : null;  // where에 null이 들어가면 기본적으로 무시하게 된다.
+    }
+
+    private BooleanExpression ageEq(Integer ageCond) {
+        return ageCond != null ? member.age.eq(ageCond) : null;
+    }
+
+    private BooleanExpression allEq(String usernameCond, Integer ageCond) {
+        return usernameEq(usernameCond).and(ageEq(ageCond));  // and를 사용해서 조립할 수 있다.(조립하려면 위 메서드 반환 타입을 BooleanExpression을 사용해야 한다.)
     }
 }
