@@ -94,7 +94,7 @@ class MemberRepositoryTest {
         PageRequest pageRequest = PageRequest.of(0, 3);  // 0페이지부터 시작해서 사이즈는 3
 
         // when
-        Page<MemberTeamDto> result = memberRepository.searchPageComplex(condition, pageRequest);
+        Page<MemberTeamDto> result = memberRepository.searchPage(condition, pageRequest);
 
         // then
         assertThat(result.getSize()).isEqualTo(3);

@@ -69,7 +69,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
     }
 
     @Override
-    public Page<MemberTeamDto> searchPageSimple(MemberSearchCondition condition, Pageable pageable) {  // 파라미터로 Pageable을 받아 페이징 처리. Pageable은 offset이나 전체 페이지 수를 알 수 있다.
+    public Page<MemberTeamDto> searchPageDeprecated(MemberSearchCondition condition, Pageable pageable) {  // 파라미터로 Pageable을 받아 페이징 처리. Pageable은 offset이나 전체 페이지 수를 알 수 있다.
         QueryResults<MemberTeamDto> results = queryFactory
                 .select(new QMemberTeamDto(
                         member.id,
@@ -96,7 +96,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
     }
 
     @Override
-    public Page<MemberTeamDto> searchPageComplex(MemberSearchCondition condition, Pageable pageable) {
+    public Page<MemberTeamDto> searchPage(MemberSearchCondition condition, Pageable pageable) {
         // contents만 가져오는 쿼리
         List<MemberTeamDto> content = queryFactory
                 .select(new QMemberTeamDto(
