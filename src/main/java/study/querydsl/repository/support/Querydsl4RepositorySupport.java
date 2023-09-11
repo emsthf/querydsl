@@ -37,7 +37,7 @@ public abstract class Querydsl4RepositorySupport {
     @Autowired
     public void setEntityManager(EntityManager entityManager) {
         Assert.notNull(entityManager, "EntityManager must not be null!");
-        
+
         JpaEntityInformation entityInformation =
                 JpaEntityInformationSupport.getEntityInformation(domainClass, entityManager);
         SimpleEntityPathResolver resolver = SimpleEntityPathResolver.INSTANCE;
@@ -75,12 +75,12 @@ public abstract class Querydsl4RepositorySupport {
         return getQueryFactory().selectFrom(from);
     }
 
-    protected <T> Page<T> applyPagination(Pageable pageable,
-                                          Function<JPAQueryFactory, JPAQuery> contentQuery) {
-        JPAQuery jpaQuery = contentQuery.apply(getQueryFactory());
-        List<T> content = getQuerydsl().applyPagination(pageable, jpaQuery).fetch();
-        return PageableExecutionUtils.getPage(content, pageable, jpaQuery.fetch()::size);
-    }
+//    protected <T> Page<T> applyPagination(Pageable pageable,
+//                                          Function<JPAQueryFactory, JPAQuery> contentQuery) {
+//        JPAQuery jpaQuery = contentQuery.apply(getQueryFactory());
+//        List<T> content = getQuerydsl().applyPagination(pageable, jpaQuery).fetch();
+//        return PageableExecutionUtils.getPage(content, pageable, jpaQuery.fetch()::size);
+//    }
 
     protected <T> Page<T> applyPagination(Pageable pageable,
                                           Function<JPAQueryFactory, JPAQuery> contentQuery,

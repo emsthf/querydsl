@@ -1,7 +1,6 @@
 package study.querydsl.repository;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQuery;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -51,19 +50,6 @@ public class MemberTestRepository extends Querydsl4RepositorySupport {
         return PageableExecutionUtils.getPage(content, pageable, query.fetch()::size);  // 조건에 따라 토탈 카운트 쿼리를 실행할지 말지 결정
     }
 
-    // 직접 만든 Querydsl4RepositorySupport를 사용한 최적화 버전
-    public Page<Member> applyPagination(MemberSearchCondition condition, Pageable pageable) {
-        return applyPagination(pageable, contentQuery -> contentQuery
-                .selectFrom(member)
-                .leftJoin(member.team, team)
-                .where(
-                        usernameEq(condition.getUsername()),
-                        teamNameEq(condition.getTeamName()),
-                        ageGoe(condition.getAgeGoe()),
-                        ageLoe(condition.getAgeLoe())
-                ));
-    }
-
     // 직접 만든 Querydsl4RepositorySupport를 사용한 카운트 쿼리 분리 + 최적화 버전
     public Page<Member> applyPagination2(MemberSearchCondition condition, Pageable pageable) {
         return applyPagination(pageable, contentQuery -> contentQuery
@@ -100,9 +86,5 @@ public class MemberTestRepository extends Querydsl4RepositorySupport {
 
     private BooleanExpression ageLoe(Integer ageLoe) {
         return ageLoe != null ? member.age.loe(ageLoe) : null;
-    }
-
-    private BooleanExpression ageBetween(int ageLoe, int ageGoe) {
-        return ageGoe(ageGoe).and(ageLoe(ageLoe));
     }
 }
